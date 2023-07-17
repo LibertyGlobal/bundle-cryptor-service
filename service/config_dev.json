@@ -1,0 +1,17 @@
+{
+    "concurency": 2,
+    "worker": {
+        "in_decoder": "json",
+        "status_encoder": "json",
+        "in_queue": "bundlecrypt-service-requests",
+        "status_queue": "bundlecrypt-service-status"
+        },
+    "envs": [
+        "BUNDLE_STORE_DIR",
+        "NGINX_STORE_DIR",
+        "BUNDLECRYPT_CONFIG_PATH"
+    ],
+    "headers": [
+        "x-request-id"
+    ]
+}

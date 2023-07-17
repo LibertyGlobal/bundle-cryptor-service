@@ -1,0 +1,83 @@
+#
+# If not stated otherwise in this file or this component's LICENSE file the
+# following copyright and licenses apply:
+#
+# Copyright 2023 Liberty Global Technology Services BV
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bundle-cryptor-charts.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "bundle-cryptor-charts.fullname" . }}
+    helm.sh/chart: {{ include "bundle-cryptor-charts.chart" . }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: {{ include "bundle-cryptor-charts.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "bundle-cryptor-charts.fullname" . }}
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9527"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: {{ include "bundle-cryptor-charts.name" . }}
+        image: {{ required "Missing `.Values.image.repository`" .Values.image.repository }}:{{ .Chart.AppVersion }}
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: {{ .Values.service.containerPort }}
+        - containerPort: 9527
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        envFrom:
+        - configMapRef:
+            name: {{ include "bundle-cryptor-charts.fullname" . }}
+        env:
+        - name: SERVICE_NAME
+          value: {{ include "bundle-cryptor-charts.fullname" . }}
+        - name: STACK_NAME
+          value: {{ include "bundle-cryptor-charts.fullname" . }}-{{ .Release.Namespace }}
+        - name: HOST_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}

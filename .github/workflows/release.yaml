@@ -1,0 +1,28 @@
+name: Release a new version
+on:
+  workflow_dispatch:
+    inputs:
+      nextRelease:
+        description: "Version to release"
+        type: string
+        required: true
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+  build:
+    uses: ./.github/workflows/build.yaml
+    needs: test
+    with:
+      pushDockerImage: true
+      version: ${{ inputs.nextRelease }}
+    secrets: inherit
+  set-release-version:
+    permissions: write-all
+    uses: ./.github/workflows/set-version.yaml
+    needs: [test, build]
+    with:
+      version: ${{ inputs.nextRelease }}
+      commit_message: "Release ${{ inputs.nextRelease }}"
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

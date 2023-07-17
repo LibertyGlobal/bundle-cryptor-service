@@ -1,0 +1,3 @@
+[submodule "bundlecrypt"]
+	path = bundlecrypt
+	url = https://github.com/LibertyGlobal/bundlecrypt.git

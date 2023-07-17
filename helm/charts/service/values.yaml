@@ -1,0 +1,10 @@
+configMap:
+  APP: bundle-cryptor-service
+
+service:
+  type: "ClusterIP"
+  port: 80
+  containerPort: 80
+
+image:
+  repository: <bundle-cryptor-service.image>

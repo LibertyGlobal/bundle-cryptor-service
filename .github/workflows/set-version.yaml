@@ -1,0 +1,56 @@
+name: Sets version on project
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to set"
+        type: string
+        required: true
+      commit_message:
+        description: "Commit message"
+        type: string
+        default: "Update version"
+    secrets:
+      token:
+        required: true
+env:
+  CI_COMMIT_AUTHOR: Dac-Cloud-Bot
+  CI_COMMIT_AUTHOR_EMAIL: dac-cloud@libertyglobal.com
+  CI_COMMIT_MESSAGE: "[CI] ${{ inputs.commit_message }} to ${{ inputs.version }}"
+  HELM_REPOSITORY: https://libertyglobal.github.io/bundle-cryptor-service/charts
+
+jobs:
+  set-version-tag-and-commit:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Configure Git
+        run: |
+          git config user.name ${{ env.CI_COMMIT_AUTHOR }}
+          git config user.email ${{ env.CI_COMMIT_AUTHOR_EMAIL }}
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.5.0
+      - name: GIT commit and push all changed files
+        run: |
+          sed -i 's|APP_VERSION = .*|APP_VERSION = '"'${{ inputs.version }}'"',|g' service/app.py
+
+          sed -i 's|^version:.*|version: ${{ inputs.version }}|g' helm/charts/service/Chart.yaml
+          sed -i 's|^appVersion:.*|appVersion: ${{ inputs.version }}|g' helm/charts/service/Chart.yaml
+
+          sed -i 's|^version:.*|version: ${{ inputs.version }}|g' helm/Chart.yaml
+          sed -i 's|^appVersion:.*|appVersion: ${{ inputs.version }}|g' helm/Chart.yaml
+
+          helm package --version ${{ inputs.version }} --app-version ${{ inputs.version }} helm -d charts/
+          helm repo index charts/ --url ${{ env.HELM_REPOSITORY }}
+
+          git add --all
+          git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git tag -a v${{ inputs.version }} -m "Version v${{ inputs.version }}" -f
+          git push --all
+          git push origin v${{ inputs.version }} -f

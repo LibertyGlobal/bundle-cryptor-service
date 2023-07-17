@@ -1,0 +1,31 @@
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Helm
+**/charts/*.tgz
+**/Chart.lock
+
+# Build
+target/*
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+
+# tox
+.tox/
+.coverage
+cover/
+.mypy_cache/
+.mutmut-cache
+
+# test
+data/
+rabbitmq_data/
+.cache/
+
+# # bundlecrypt
+# bundlecrypt/

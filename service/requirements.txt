@@ -1,0 +1,4 @@
+boto3~=1.17.101
+gunicorn>=3.5
+flask~=2.0.1
+pika~=1.2.0

@@ -1,0 +1,66 @@
+#
+# If not stated otherwise in this file or this component's LICENSE file the
+# following copyright and licenses apply:
+#
+# Copyright 2023 Liberty Global Technology Services BV
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: '3.2'
+
+services:
+  bundle-cryptor-service:
+    build:
+      context: ./
+      dockerfile: ./service/Dockerfile
+    container_name: bundle-cryptor-service
+    environment:
+      - BUNDLE_STORE_DIR=/usr/local/generated_bundles
+      - NGINX_STORE_DIR=/usr/local/nginx_bundles
+      - BUNDLECRYPT_CONFIG_PATH=/usr/local/configs
+      - BUNDLECRYPT_KEYSDIR=/keys
+      - RABBITMQ_HOST=bundle-generator-rabbit
+    volumes:
+      - ./data/generated_bundles:/usr/local/generated_bundles
+      - ./data/nginx_bundles:/usr/local/nginx_bundles
+      - ./data/bundlecrypt_configs:/usr/local/configs
+    ports:
+      - 10001:8080
+    privileged: true
+    tty: true
+    healthcheck:
+      test: ["CMD", "exit", "0"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    depends_on:
+      - bundle-generator-rabbit
+    links:
+      - bundle-generator-rabbit:bundle-generator-rabbit
+    restart: always
+
+  bundle-generator-rabbit:
+    image: rabbitmq:3-management
+    hostname: bundle-generator-rabbit
+    container_name: bundle-generator-rabbit
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq/mnesia/
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3

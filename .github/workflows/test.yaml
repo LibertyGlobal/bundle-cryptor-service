@@ -1,0 +1,30 @@
+name: Tests
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python: ["3.8"]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install tox and any other packages
+        run: pip install tox
+      - name: Run tox
+        # Run tox using the version of Python in `PATH`
+        run: tox
+      # - name: Build
+      #   run: |
+      #     docker build -t service ./service
+      #     docker build -t bundlegen -f ./BundleGen/docker/rabbitmq/Dockerfile ./BundleGen

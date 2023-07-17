@@ -1,0 +1,43 @@
+name: Builds the project
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to build"
+        type: string
+        required: true
+      pushDockerImage:
+        description: "Push docker image"
+        default: false
+        type: boolean
+    secrets:
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_PASSWORD:
+        required: true
+env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_SERVICE_IMAGE_NAME: bundle-cryptor-service
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Build
+        run: |
+          sed -i 's|APP_VERSION = .*|APP_VERSION = '"'${{ inputs.version }}'"',|g' service/app.py
+          docker build bundlecrypt -f ./bundlecrypt/docker/Dockerfile ./bundlecrypt
+          docker build -t ${{ env.DOCKER_REGISTRY }}/${{ secrets.REGISTRY_USERNAME }}/${{ env.DOCKER_SERVICE_IMAGE_NAME }}:${{ inputs.version }} ./service
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Push
+        if: inputs.pushDockerImage == true
+        run: |
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ secrets.REGISTRY_USERNAME }}/${{ env.DOCKER_SERVICE_IMAGE_NAME }}:${{ inputs.version }}
