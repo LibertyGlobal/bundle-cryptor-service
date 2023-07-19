@@ -8,3 +8,18 @@ service:
 
 image:
   repository: <bundle-cryptor-service.image>
+
+pv:
+  path: /bundle-generator-bundlegen/data
+  server: <ip address of nfs>
+
+init:
+  image: alpine/git
+  repository: <repo with keys>
+  secret: <id_rsa key for git clone base64>
+
+configfile: |
+  {
+  "formatVersion": "1.0.0",
+  "cryptConfigurations": {...}
+  }

@@ -51,6 +51,6 @@ jobs:
 
           git add --all
           git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
-          git tag -a v${{ inputs.version }} -m "Version v${{ inputs.version }}" -f
-          git push --all
-          git push origin v${{ inputs.version }} -f
+          git push origin main
+          git tag v${{ inputs.version }} -f
+          git push origin --tags -f

@@ -52,3 +52,13 @@ Quotes is $value.indent != true and $value.quote = true or $value.quote does not
   {{- end }}
   {{- end }}
 {{- end }}
+---
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-file
+  namespace: {{ .Release.Namespace }}
+data:
+  config.json: |
+{{ .Value.confgifile | indent 4 }}

@@ -40,6 +40,18 @@ spec:
         prometheus.io/port: "9527"
         prometheus.io/scrape: "true"
     spec:
+      initContainers:
+      - name: git-pull
+        image: {{ $.Values.init.image }}
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh"]
+        args: ["-c", "git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' && cd /keys && git clone {{ .Values.init.repository }} "]
+        volumeMounts:
+        - name: keys-dir
+          mountPath: /keys
+        - name: git-secret
+          mountPath: /root/.ssh/id_rsa
+          subPath: id_rsa
       containers:
       - name: {{ include "bundle-cryptor-charts.name" . }}
         image: {{ required "Missing `.Values.image.repository`" .Values.image.repository }}:{{ .Chart.AppVersion }}
@@ -81,3 +93,25 @@ spec:
               fieldPath: metadata.name
         - name: NAMESPACE
           value: {{ .Release.Namespace }}
+        volumeMounts:
+        - mountPath: /data
+          name: bundle-cryptor-service
+        - name: keys-dir
+          mountPath: /keys
+        - name: config-file
+          mountPath: /configs/config.json
+          subPath: config.json
+      volumes:
+      - name: bundle-cryptor-service
+        persistentVolumeClaim:
+          claimName: pvc-bundle-data-cryptor
+      - name: keys-dir
+        emptyDir: {}
+      - name: config-file
+        configMap:
+          name: config-file
+          defaultMode: 0744
+      - name: git-secret
+        secret:
+          defaultMode: 0600
+          secretName: git-secret
