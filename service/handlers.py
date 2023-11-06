@@ -63,6 +63,8 @@ class BundleCryptHandler:
     def __init__(self, config: "Config") -> None:
         self.config = config
         self.configs_path = os.environ.get("BUNDLECRYPT_CONFIG_PATH")
+        self.uid = os.environ.get("BUNDLECRYPT_UID", 252)
+        self.gid = os.environ.get("BUNDLECRYPT_GID", 252)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.request_id_map: Dict[str, str] = {}
 
@@ -94,9 +96,9 @@ class BundleCryptHandler:
         config_id = self.get_config(platform_name)
         self.logger.info(f"{config_path=}, {config_id=}")
         os.makedirs(os.path.dirname(protected_bundle_path), exist_ok=True)
-        os.chown(os.path.dirname(protected_bundle_path), uid=252, gid=252)
+        os.chown(os.path.dirname(protected_bundle_path), uid=self.uid, gid=self.gid)
         crypt(Path(config_path), config_id, unprotected_bundle_path, protected_bundle_path,
-              uid=252, gid=252, remove_other_permissions=True)
+              uid=self.uid, gid=self.gid, remove_other_permissions=True)
 
     def get_config(self, platform_name: str) -> Dict[str, Dict]:
         """Read config map from file"""
