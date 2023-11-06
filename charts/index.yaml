@@ -2,14 +2,14 @@ apiVersion: v1
 entries:
   bundle-cryptor-service:
   - apiVersion: v2
-    appVersion: 0.0.12
-    created: "2023-07-21T16:27:49.309720909Z"
+    appVersion: 0.0.13
+    created: "2023-11-06T13:11:06.314653293Z"
     description: Bundle Cryptor service
-    digest: 62937cc8617c6f846e51d081a351a0efb6af30af26908dddd8cb679a49abbd4b
+    digest: b60c2141a76d46cb1f960ca2ca000103662ec78ebc8b22afacb7b2d6bbef506a
     kubeVersion: '>=1.12.0-0'
     name: bundle-cryptor-service
     type: application
     urls:
-    - https://libertyglobal.github.io/bundle-cryptor-service/charts/bundle-cryptor-service-0.0.12.tgz
-    version: 0.0.12
-generated: "2023-07-21T16:27:49.309101702Z"
+    - https://libertyglobal.github.io/bundle-cryptor-service/charts/bundle-cryptor-service-0.0.13.tgz
+    version: 0.0.13
+generated: "2023-11-06T13:11:06.314040381Z"
