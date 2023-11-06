@@ -63,8 +63,8 @@ class BundleCryptHandler:
     def __init__(self, config: "Config") -> None:
         self.config = config
         self.configs_path = os.environ.get("BUNDLECRYPT_CONFIG_PATH")
-        self.uid = os.environ.get("BUNDLECRYPT_UID", 252)
-        self.gid = os.environ.get("BUNDLECRYPT_GID", 252)
+        self.uid = int(os.environ.get("BUNDLECRYPT_UID", 252))
+        self.gid = int(os.environ.get("BUNDLECRYPT_GID", 252))
         self.logger = logging.getLogger(self.__class__.__name__)
         self.request_id_map: Dict[str, str] = {}
 
