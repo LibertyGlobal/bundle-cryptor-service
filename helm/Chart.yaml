@@ -1,7 +1,7 @@
 apiVersion: v2
-appVersion: 0.0.13
+appVersion: 0.0.14
 name: bundle-cryptor-service
 description: Bundle Cryptor service
 type: application
 kubeVersion: ">=1.12.0-0"
-version: 0.0.13
+version: 0.0.14
