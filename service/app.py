@@ -18,9 +18,10 @@
 #
 
 from flask import Flask
+from info import Info
 
 app = Flask(__name__)
-
+app_info = Info()
 
 @app.route("/healthz")
 def healthz() -> str:
@@ -28,4 +29,4 @@ def healthz() -> str:
 
 @app.route('/info')
 def info():
-    return 'OK'
+    return app_info.get()
