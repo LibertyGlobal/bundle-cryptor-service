@@ -19,6 +19,7 @@
 
 from flask import Flask
 from info import Info
+from typing import Dict
 
 app = Flask(__name__)
 app_info = Info()
@@ -28,5 +29,5 @@ def healthz() -> str:
     return 'OK'
 
 @app.route('/info')
-def info():
+def info() -> Dict[str, str]:
     return app_info.get()
